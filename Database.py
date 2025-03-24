@@ -2,7 +2,7 @@ import os
 from supabase import create_client
 import cohere
 
-class DatabaseUploader:
+class Database:
     SUPABASE_URL = os.getenv("SUPABASE_URL")
     SUPABASE_ANON_KEY = os.getenv("SUPABASE_ANON_KEY")
     COHERE_API_KEY = os.getenv("COHERE_API_KEY")
@@ -29,6 +29,14 @@ class DatabaseUploader:
             self.supabase.table(table).insert(record).execute()
         except Exception as e:
             print(f"Failed to insert {record} {e}")
+
+    def get_univerities(self):
+        try:
+            universities = self.supabase.table("universities").execute().data
+            return universities
+        except Exception as e:
+            print(f"Failed to fetch universities {e}")
+            return []
     
     def generate_embeddings(self,text):
         try:
@@ -86,3 +94,4 @@ class DatabaseUploader:
                     "embedding": embedding, "prof_id": prof["id"]})
 
         self.batch_insert("research_interests", records)
+
