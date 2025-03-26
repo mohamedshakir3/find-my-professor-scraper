@@ -890,7 +890,7 @@ class McGillScraper(Scraper):
         }
     
     def directory_scraper(self, url, faculty, department=""):
-        page = self.fetch_url(page)
+        page = self.fetch_url(url)
         if not page:
             logging.error(f"Failed to fetch {url}")
             return []
