@@ -48,6 +48,7 @@ class LLMScraper:
         return asyncio.run(self._async_scrape(url))
     
     def prompt(self, content):
+        print("Processing LLM prompt...")
         prompt = "Given a professor biography, extract a comma separated list of research interests for this professor. Return only a comma separated list of research interests, if no interests are found, return nothing."
         response = self.deepseek.chat.completions.create(
             model="deepseek-chat",
