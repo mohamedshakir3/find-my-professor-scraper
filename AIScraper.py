@@ -1,6 +1,7 @@
 import json
 import os
 import asyncio
+from openai import OpenAI
 from crawl4ai import AsyncWebCrawler, BrowserConfig, CacheMode, CrawlerRunConfig, LLMConfig
 from crawl4ai.extraction_strategy import LLMExtractionStrategy
 from pydantic import BaseModel, Field
@@ -14,6 +15,9 @@ class LLMScraper:
 
     def __init__(self):
         """Initialize LLM Scraper with config"""
+        self.deepseek = OpenAI(
+            api_key=os.getenv("DEEPSEEK_API"),
+            base_url="https://api.deepseek.com")
         self.llm_strategy = LLMExtractionStrategy(
             llm_config=LLMConfig(
                 provider="deepseek/deepseek-chat",
@@ -42,6 +46,18 @@ class LLMScraper:
     def scrape(self, url):
         """Run async scrape in a synchronous way"""
         return asyncio.run(self._async_scrape(url))
+    
+    def prompt(self, content):
+        prompt = "Given a professor biography, extract a comma separated list of research interests for this professor. Return only a comma separated list of research interests, if no interests are found, return nothing."
+        response = self.deepseek.chat.completions.create(
+            model="deepseek-chat",
+            messages=[
+                {"role": "system", "content": prompt},
+                {"role": "user", "content": content},
+            ],
+            stream=False
+        )
+        return response.choices[0].message.content
 
     async def _async_scrape(self, url):
         """Internal async scraping logic"""

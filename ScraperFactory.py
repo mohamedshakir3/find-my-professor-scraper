@@ -1,4 +1,4 @@
-from UniversityScrapers import uOttawaScraper, CarletonScraper, uWaterlooScraper
+from UniversityScrapers import uOttawaScraper, CarletonScraper, uWaterlooScraper, McMasterScraper
 class ScraperFactory:
     def __init__(self, university, directory):
         self.university = university
@@ -11,5 +11,7 @@ class ScraperFactory:
             return CarletonScraper(self.directory)
         elif self.university == "University of Waterloo":
             return uWaterlooScraper(self.directory)
+        elif self.university == "McMaster University":
+            return McMasterScraper(self.directory)
         else:
             raise Exception("Invalid University")

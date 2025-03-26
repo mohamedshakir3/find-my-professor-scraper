@@ -42,7 +42,7 @@ class Database:
         try:
             response = self.cohere_client.embed(
                 texts=[text],
-                model="embed-english-v3.0",
+                model=self.model_name,
                 input_type="search_document"
             )
 
@@ -79,10 +79,13 @@ class Database:
 
         self.batch_insert("professors", data)
 
-    def update_research_interests(self):
+    def update_research_interests(self, university=""):
         records = []
-        
-        professors = self.supabase.table("professors").select("*").execute().data
+        if university:
+            professors = self.supabase.table("professors").select("*").eq("university", university).execute().data
+        else:
+            professors = self.supabase.table("professors").select("*").execute().data
+            
         
         for prof in professors:
             print(f"Processing {prof["name"]}")
@@ -95,3 +98,6 @@ class Database:
 
         self.batch_insert("research_interests", records)
 
+    def update_universities(self, name, university):
+        print(f"Uploading {name}")
+        self.supabase.table("universities").insert({"name": name, "university": university}).execute()
