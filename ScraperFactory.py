@@ -1,4 +1,4 @@
-from UniversityScrapers import uOttawaScraper, CarletonScraper, uWaterlooScraper, McMasterScraper, uoftScraper, McGillScraper
+from UniversityScrapers import uOttawaScraper, CarletonScraper, uWaterlooScraper, McMasterScraper, uoftScraper, McGillScraper, UBCScraper
 import logging
 
 logger = logging.getLogger(__name__)
@@ -28,5 +28,9 @@ class ScraperFactory:
         elif self.university == "McGill University":
             logging.info("Intializing McGill scraper.")
             return McGillScraper(self.directory)
+        elif self.university == "University of British Columbia":
+            logging.info("Intializing UBC scraper.")
+            return UBCScraper(self.directory)
+        
         else:
             raise Exception("Invalid University")

@@ -1,3 +1,4 @@
+from ollama import chat, ChatResponse
 import json
 import os
 import asyncio
@@ -59,6 +60,91 @@ class LLMScraper:
             stream=False
         )
         return response.choices[0].message.content
+    
+    def mistral(self,  content):
+        prompt = """
+        You are an expert in extracting and summarizing research interests from professor biographies.
+
+        Given a professor biography, extract the research interests as a concise, **semicolon-separated list**.
+        - **Summarize slightly** but not too much, only enough clear phrases (no more than 10 words each).
+        - **Preserve important technical terms** and compound phrases.
+        - **Avoid duplication** and redundant phrases.
+        - If no explicit research interests are mentioned, return an empty string (no text or explanation).
+
+        **Input:**  
+        {content}
+
+        **Output:**  
+        A semicolon-separated list of summarized research interests or an empty string.
+        """
+        print("Processing prompt with Mistral...")
+        response: ChatResponse = chat(
+            model = "mistral",
+            messages = [
+                 {"role": "system", "content": "You are an expert in extracting and summarizing research interests from professor biographies."},
+                {"role": "user", "content": prompt.format(content=content)},
+            ],
+            options = {
+                "num_ctx": 30000,
+                "temperature": 0.4
+            },
+            stream=False
+        )
+        return response.message.content
+
+    def qwen(self, content):
+        prompt = f"""
+        You are an expert in **extracting detailed research interests** from professor biographies.
+
+        Given a professor biography, **extract all mentioned research interests** as a concise, **semicolon-separated list**.
+        - **Include all technical terms** and multi-word phrases as they appear.
+        - **Group similar areas** into concise terms but avoid losing details.
+        - **Do not truncate or oversimplify** complex phrases.
+        - If no explicit research interests are mentioned, return an empty string (no text or explanation).
+
+        **Input:**  
+        {content}
+
+        **Output:**  
+        A semicolon-separated list of all relevant research interests or an empty string.
+        """
+
+        response: ChatResponse = chat(
+            model="qwen2.5:14b",
+            messages=[
+                {"role": "system", "content": "You are an expert in extracting detailed research interests from professor biographies."},
+                {"role": "user", "content": prompt},
+            ],
+            options={"num_ctx": 30000, "temperature": 0.3, "top_p": 0.9}
+        )
+        return response.message.content
+    
+    def deepseek_coder(self, content):
+        prompt = f"""
+        You are an expert in extracting and summarizing research interests from professor biographies.
+
+        Given a professor biography, extract the research interests as a concise, **semicolon-separated list**.
+        - **Preserve important technical terms** and compound phrases.
+        - **Avoid duplication** and redundant phrases.
+        - If no explicit research interests are mentioned, return an empty string (no text or explanation).
+
+        **Input:**  
+        {content}
+
+        **Output:**  
+        A semicolon-separated list of summarized research interests or an empty string.
+        """
+        
+        response: ChatResponse = chat(
+            model = "deepseek-coder:6.7b",
+            messages = [
+                {"role": "system", "content": "You are an expert in extracting and summarizing research interests from professor biographies."},
+                {"role": "user", "content": prompt},
+            ],
+            options = {"num_ctx": 30000, "temperature": 0.1, "top_p": 0.8}
+        )
+        
+        return response.message.content
 
     async def _async_scrape(self, url):
         """Internal async scraping logic"""

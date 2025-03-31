@@ -1,0 +1,165 @@
+{
+  "University of Ottawa": {
+    "Faculty of Education": "https://www.uottawa.ca/faculty-education/our-professors",
+    "Faculty of Engineering": {
+      "Department of Chemical and Biological Engineering": "https://www.uottawa.ca/faculty-engineering/department-chemical-and-biological-engineering/directory",
+      "Department of Civil Engineering": "https://www.uottawa.ca/faculty-engineering/department-civil-engineering/directory",
+      "Department of Mechanical Engineer": "https://www.uottawa.ca/faculty-engineering/department-mechanical-engineering/directory",
+      "School of Engineering Design and Teaching Innovation": "https://www.uottawa.ca/faculty-engineering/school-engineering-design-teaching-innovation/directory",
+      "School of Electrical Engineering and Computer Science": "https://www.uottawa.ca/faculty-engineering/school-electrical-engineering-computer-science/directory"
+    },
+    "Faculty of Health Science": {
+      "School of Human Kinetics": "https://www.uottawa.ca/faculty-health-sciences/human-kinetics/our-professors",
+      "School of Nursing": "https://www.uottawa.ca/faculty-health-sciences/nursing/our-professors",
+      "School of Nutrition": "https://www.uottawa.ca/faculty-health-sciences/nutrition/our-professors",
+      "School of Rehabilitation Science": "https://www.uottawa.ca/faculty-health-sciences/rehabilitation/our-professors"
+    },
+    "Faculty of Law": {
+      "Common Law": "https://www.uottawa.ca/faculty-law/common-law/faculty/full-time-permanent-english-program-professors",
+      "Civil Law": "https://www.uottawa.ca/faculte-droit/droit-civil/corps-professoral/professeurs-reguliers"
+    },
+    "Faculty of Medicine": {
+      "School of Epidemiology and Public Health": "https://www.uottawa.ca/faculty-medicine/epidemiology/faculty",
+      "Department of Biochemistry, Microbiology and Immunology": "https://www.uottawa.ca/faculty-medicine/biochemistry-microbiology-immunology/faculty",
+      "Department of Cellular and Molecular Medicine": "https://www.uottawa.ca/faculty-medicine/cellular-molecular/about/faculty-members",
+      "Department of Innovation in Medical Education": "https://www.uottawa.ca/faculty-medicine/department-innovation/overview/faculty"
+    },
+    "Faculty of Science": {
+      "Department of Biology": "https://www.uottawa.ca/faculty-science/biology/professor-directory",
+      "Department of Chemistry and Biomolecular Sciences": "https://www.uottawa.ca/faculty-science/chemistry-biomolecular-sciences/professor-directory",
+      "Department of Earth and Environmental Sciences": "https://www.uottawa.ca/faculty-science/earth-environmental-sciences/professor-directory",
+      "Department of Mathematics and Statistics": "https://www.uottawa.ca/faculty-science/mathematics-statistics/professor-directory",
+      "Department of Physics": "https://www.uottawa.ca/faculty-science/physics/professor-directory"
+    },
+    "Telfer School of Mangagement": "https://telfer.uottawa.ca/en/directory/professors/"
+  },
+
+  "Carleton University": {
+    "Faculty of Arts and Social Sciences": {
+      "The College of the Humanities": "https://carleton.ca/chum/staff-faculty-listing/",
+      "Department of English Language and Literature": "https://carleton.ca/english/our-people/",
+      "Department of French": "https://carleton.ca/french/faculty/",
+      "Geography and Environmental Studies": "https://carleton.ca/geography/staff-faculty-2/",
+      "Department of History": "https://carleton.ca/history/contact/faculty-listing/",
+      "Department of Philosophy": "https://carleton.ca/philosophy/faculty/",
+      "Department of Psychology": "https://carleton.ca/psychology/faculty-staff/faculty-listing/",
+      "School of Canadian Studies": "https://carleton.ca/canadianstudies/our-team/faculty/"
+    },
+    "Faculty of Engineering": {
+      "Department Civil and Environmental Engineering": "https://carleton.ca/cee/faculty/",
+      "Department of Electronics": "https://carleton.ca/doe/faculty-members/",
+      "Department of Mechanical and Aerospace Engineering": "https://carleton.ca/mae/staff-and-faculty/",
+      "Department of Systems and Computer Engineering": "https://carleton.ca/sce/faculty/"
+    },
+    "Faculty of Engineering and Design": {
+      "Azrieli School of Architecture & Urbanism": "https://architecture.carleton.ca/people-listing/",
+      "Industrial Design": "https://carleton.ca/id/people/",
+      "School of Information Technology": "https://www.csit.carleton.ca/index.php?pageID=PeopleFaculty"
+    },
+    "Faculty of Science": {
+      "Department of Biology": "https://carleton.ca/biology/facultystaff-listing/faculty/",
+      "Department of Chemistry": "https://carleton.ca/chemistry/staff-and-faculty-listing/",
+      "Department of Health Science": "https://carleton.ca/healthsciences/faculty-and-research/",
+      "School of Computer Science": "https://carleton.ca/scs/our-people/",
+      "School of Mathematics and Statistics": "https://carleton.ca/math/our-people/faculty-members/"
+    },
+    "Sprott School of Business": "https://sprott.carleton.ca/directory/"
+  },
+  "University of Waterloo": {
+    "Faculty of Arts": {
+      "Department of Anthropology": "https://uwaterloo.ca/anthropology/contacts/faculty",
+      "Department of Classical Studies": "https://uwaterloo.ca/classical-studies/contacts?title=&group%5B67%5D=67",
+      "Department of Communication Arts": "https://uwaterloo.ca/communication-arts/contacts?title=&group%5B167%5D=167",
+      "Department of Economics": "https://uwaterloo.ca/economics/contacts?title=&group%5B73%5D=73",
+      "Department of English Language and Literature": "https://uwaterloo.ca/english/contacts/faculty-profiles",
+      "Department of Fine Arts": "https://uwaterloo.ca/fine-arts/contacts?title=&group%5B66%5D=66&group%5B67%5D=67",
+      "Department of French Studies": "https://uwaterloo.ca/french-studies/contacts/faculty",
+      "Department of Germanic and Slavic Studies": "https://uwaterloo.ca/germanic-slavic-studies/about/people/faculty-profiles",
+      "Department of History": "https://uwaterloo.ca/history/contacts?title=&group%5B58%5D=58",
+      "Department of Philosophy": "https://uwaterloo.ca/philosophy/contacts?title=&group%5B61%5D=61",
+      "Department of Political Science": "https://uwaterloo.ca/political-science/contacts/faculty",
+      "Department of Psychology": "https://uwaterloo.ca/psychology/contacts?title=&group[58]=58",
+      "Department of Religious Studies": "https://uwaterloo.ca/religious-studies/contacts?title=&group%5B67%5D=67",
+      "Department of Sociology and Legal Studies": "https://uwaterloo.ca/sociology-and-legal-studies/about/our-people",
+      "Department of Spanish and Latin American Studies": "https://uwaterloo.ca/spanish/contacts"
+    },
+    "Faculty of Engineering": {
+      "School of Architecture": "https://uwaterloo.ca/architecture/contacts?title=&group%5B60%5D=60",
+      "Conrad School of Entrepreneurship and Business": "https://uwaterloo.ca/conrad-school-entrepreneurship-business/contacts?title=&group%5B79%5D=79",
+      "Department of Chemical Engineering": "https://uwaterloo.ca/chemical-engineering/contacts?title=&group[67]=67",
+      "Department of Civil & Environmental Engineering": "https://uwaterloo.ca/civil-environmental-engineering/contacts?title=&group[60]=60",
+      "Department of Electrical & Computer Engineering": "https://uwaterloo.ca/electrical-computer-engineering/contacts?title=&group[61]=61",
+      "Department of Management Science and Engineering": "https://uwaterloo.ca/management-science-engineering/contacts?title=&group[60]=60",
+      "Department of Mechanical & Mechatronics Engineering": "https://uwaterloo.ca/mechanical-mechatronics-engineering/contacts?title=&group[78]=78",
+      "Department of Systems Design Engineering": "https://uwaterloo.ca/systems-design-engineering/contacts?title=&group%5B68%5D=68"
+    },
+    "Faculty of Environment": {
+      "Department of Geography & Environmental Management": "https://uwaterloo.ca/geography-environmental-management/profiles/faculty-profiles",
+      "Department of Knowledge Integration": "https://uwaterloo.ca/knowledge-integration/profiles?title=&type%5B50%5D=50",
+      "School of Environment, Enterprise and Development": "https://uwaterloo.ca/school-environment-enterprise-development/profiles?type%5B50%5D=50",
+      "School of Environment, Resources and Sustainability": "https://uwaterloo.ca/environment-resources-and-sustainability/profiles?title=&type%5B50%5D=50",
+      "School of Planning": "https://uwaterloo.ca/planning/profiles?title=&type%5B58%5D=58"
+    },
+    "Faculty of Health": {
+      "Department of Kinesiology and Health Sciences": "https://uwaterloo.ca/kinesiology-health-sciences/contacts?title=&group%5B58%5D=58",
+      "Department of Recreation and Leisure Studies": "https://uwaterloo.ca/recreation-and-leisure-studies/contacts?title=&group%5B60%5D=60",
+      "School of Public Health Sciences": "https://uwaterloo.ca/public-health-sciences/contacts?title=&group%5B62%5D=62"
+    },
+    "Faculty of Math": {
+      "Department of Applied Mathematics": "https://uwaterloo.ca/applied-mathematics/department-members/faculty-members",
+      "David R. Cheriton School of Computer Science": "https://cs.uwaterloo.ca/contacts?title=&group%5B68%5D=68",
+      "Department of Combinatorics and Optimization": "https://uwaterloo.ca/combinatorics-and-optimization/contacts?title=&group%5B66%5D=66",
+      "Department of Pure Mathematics": "https://uwaterloo.ca/pure-mathematics/department-members/faculty-members",
+      "Department of Statistics and Actuarial Science": "https://uwaterloo.ca/statistics-and-actuarial-science/contacts?title=&group%5B66%5D=66&group%5B101%5D=101&group%5B67%5D=67"
+    },
+    "Faculty of Science": {
+      "Department of Biology": "https://uwaterloo.ca/biology/contacts?title=&group%5B85%5D=85",
+      "Department of Chemistry": "https://uwaterloo.ca/chemistry/contacts?title=&group%5B68%5D=68",
+      "Department of Earth and Environmental Sciences": "https://uwaterloo.ca/earth-environmental-sciences/contacts?title=&group[59]=59",
+      "Department of Physics and Astronomy": "https://uwaterloo.ca/physics-astronomy/contacts?title=&group%5B64%5D=64",
+      "School of Optometry and Vision Science": "https://uwaterloo.ca/optometry-vision-science/contacts?title=&group[49]=49",
+      "School of Pharmacy": "https://uwaterloo.ca/pharmacy/contacts?title=&group%5B58%5D=58"
+    }
+  },
+  "McMaster University": {
+    "Faculty of Engineering": {
+      "Department of Chemical Engineering": "https://www.eng.mcmaster.ca/faculty-staff/faculty-directory/?filter-search=&filter-research-cluster=&filter-department=52#faculty-listing__filter",
+      "Department of Civil Engineering": "https://www.eng.mcmaster.ca/faculty-staff/faculty-directory/?filter-search=&filter-research-cluster=&filter-department=54#faculty-listing__filter",
+      "Department of Computing and Software": "https://www.eng.mcmaster.ca/faculty-staff/faculty-directory/?filter-search=&filter-research-cluster=&filter-department=56#faculty-listing__filter",
+      "Department of Electrical & Computer Engineering": "https://www.eng.mcmaster.ca/faculty-staff/faculty-directory/?filter-search=&filter-research-cluster=&filter-department=58#faculty-listing__filter",
+      "Department of Engineering Physics": "https://www.eng.mcmaster.ca/faculty-staff/faculty-directory/?filter-search=&filter-research-cluster=&filter-department=60#faculty-listing__filter",
+      "Department of Materials Science & Engineering": "https://www.eng.mcmaster.ca/faculty-staff/faculty-directory/?filter-search=&filter-research-cluster=&filter-department=63#faculty-listing__filter",
+      "Department of Mechanical Engineering": "https://www.eng.mcmaster.ca/faculty-staff/faculty-directory/?filter-search=&filter-research-cluster=&filter-department=65#faculty-listing__filter",
+      "School of Biomedical Engineering": "https://www.eng.mcmaster.ca/faculty-staff/faculty-directory/?filter-search=&filter-research-cluster=&filter-department=72#faculty-listing__filter"
+    }
+  },
+  "University of Toronto": {
+    "Faculty of Applied Science and Engineering": {
+      "Department of Chemical Engineering and Applied Chemistry": "https://chem-eng.utoronto.ca/faculty-staff/faculty-members/",
+      "Department of Civil and Mineral Engineering": "https://civmin.utoronto.ca/home/about-us/directory/",
+      "Department of Materials Science and Engineering": "https://mse.utoronto.ca/faculty-staff/professors/",
+      "Department of Mechanical and Industrial Engineering": "https://www.mie.utoronto.ca/faculty-staff/core-faculty/",
+      "The Edward S. Rogers Sr. Department of Electrical and Computer Engineering": "https://www.ece.utoronto.ca/faculty/faculty-directory/"
+    },
+    "Faculty of Arts and Science": {
+      "Department of Computer Science": "https://web.cs.toronto.edu/people/faculty-directory",
+      "Department of Mathematics": "https://www.mathematics.utoronto.ca/people/directories/all-faculty?sort_by=ppl_last_name_value&items_per_page=All&fy_uoft_roles_tid[]=45&fy_uoft_roles_tid[]=46&fy_uoft_roles_tid[]=1259&fy_uoft_roles_tid[]=1262"
+    }
+  },
+  "McGill University": {
+    "Faculty of Engineering": {
+      "Department of Bioengineering": "https://www.mcgill.ca/bioengineering/people",
+      "Department of Chemical Engineering": "https://www.mcgill.ca/chemeng/people",
+      "Department of Civil Engineering": "https://www.mcgill.ca/civil/people",
+      "Department of Electrical & Computer Engineering": "https://www.mcgill.ca/ece/people",
+      "Department of Mechanical Engineering": "https://www.mcgill.ca/mecheng/people"
+    },
+    "Faculty of Science": {
+      "Department of Mathematics and Statistics": "https://www.mcgill.ca/mathstat/people-0/academic-staff",
+      "Department of Computer Science": "https://www.cs.mcgill.ca/people/faculty/"
+    }
+  },
+  "University of British Columbia": {
+    "Faculty of Engineering": "https://engineering.ubc.ca/about/faculty-directory"
+  }
+}

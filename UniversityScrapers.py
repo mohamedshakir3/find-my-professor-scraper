@@ -11,8 +11,8 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.chrome.options import Options
 import logging
-from typing import overload
 import time
+from selenium.webdriver.support.ui import Select
 
 logger = logging.getLogger(__name__)
 
@@ -55,12 +55,25 @@ class Scraper(ABC):
     def profile_scraper(self, url, department=None):
         """Scrapes professor profile page"""
         pass
+    
+    def clean_html(self, page):
+        soup = BeautifulSoup(page, 'html.parser')
+        
+        stop_tags = ["style", "script", "meta", "head", "noscript"]
+        
+        
+        for tag in soup(stop_tags):
+            tag.decompose()
+        
+        if not page:
+            print("No page!")
+        return  " ".join(soup.get_text(separator=" ").split())
 
 
     def run(self):
         profile_data = []
-        faculty, department = "Faculty of Engineering", "Department of Bioengineering"
-        profile_data = self.directory_scraper(self.university[faculty][department], faculty, department)
+        faculty = "Faculty of Engineering"
+        profile_data = self.directory_scraper(self.university[faculty], faculty)
         # for faculty in self.university:
         #     logging.info(f"Processing {faculty}")
         #     if type(self.university[faculty]) is str:
@@ -885,9 +898,17 @@ class uoftScraper(Scraper):
 class McGillScraper(Scraper):
     def __init__(self, university):
         super().__init__(university)
-        self.base_url_mapping = {
-            "Department of Bioengineering": "https://www.mcgill.ca/bioengineering"
-        }
+        self.base_url = "https://www.mcgill.ca"
+        self.options = Options()
+        self.options.add_argument("--headless")
+        
+    def is_research_header(self, header):
+        return (
+            ("areas" in header and "interest" in header) or 
+            ("current" in header and "research" in header) or 
+            ("areas" in header and "expertise" in header) or 
+            ("research" in header and "areas" in header)
+        )
     
     def directory_scraper(self, url, faculty, department=""):
         page = self.fetch_url(url)
@@ -899,19 +920,294 @@ class McGillScraper(Scraper):
         
         soup = BeautifulSoup(page, 'html.parser')
         
-        if department == "Department of Bioengineering":
+       
+        if faculty == "Faculty of Engineering":
             headers = soup.find_all("h2", class_="mcgill-profiles-display-name")
             if not headers:
-                logging.error(f"Failed to scrape {department}")
+                logging.error(f"Failed to scrape {department} no headers found")
                 return []
             links = [header.find("a", href=True)["href"] for header in headers]
+            
+        elif department == "Department of Mathematics and Statistics":
+            professor_header = soup.find("h2", string="Professors")
+            if not professor_header:
+                logging.error("Failed to find professors table")
+                return []
+            table = professor_header.find_next("table")
+            if not table:
+                logging.error("Failed to find professors table")
+                return []
+
+            rows = table.find_all("tr")
+            links = [row.find("a", href=True)["href"] for row in rows if row.find("a", href=True)]
+            for link in links:
+                if not link.startswith("http"):
+                    link = self.base_url + link
+                research_interets, name, email = self.profile_scraper(link, faculty)
+                if research_interets and name and email:
+                    profiles.append({"name": name,
+                                    "university": "McGill University", 
+                                    "faculty": faculty,
+                                    "department": department,
+                                    "website": link,
+                                    "email": email,
+                                    "research_interests": research_interets})
         
-        for link in links:
-            print(link)
-        
-        
+        elif department == "Department of Computer Science":
+            professor_header = soup.find("h2", string="Professors")
+            if not professor_header:
+                logging.error("Failed to find professor header.")
+                return []
+           
+            rows = soup.find_all("div", class_="col-md-6")
+            for sibling in professor_header.find_next_siblings():
+                if sibling.name == "h2":
+                    break
+
+                # Extract professors from rows
+                rows = sibling.find_all("div", class_="col-md-6")
+                for row in rows:
+                    name_tag = row.find("h4")
+                    name = name_tag.get_text(strip=True) if name_tag else "N/A"
+
+                    website_tag = row.find("a", href=True, text="Website")
+                    website = website_tag["href"] if website_tag else "N/A"
+
+                    email = "N/A"
+                    email_tags = row.find_all("a", class_="list-group-item")
+                    for tag in email_tags:
+                        if tag:
+                            lines = tag.get_text(separator="\n").split("\n")
+                            for line in lines:
+                                if "Email:" in line:
+                                    email = line.split(":")[-1].strip()
+                                    break
+
+
+                    links.append((
+                        name,
+                        email,
+                        website
+                    ))
+
+            for name, email, link in links:
+                research_interets = self.profile_scraper(link, department)
+                profiles.append({"name": name,
+                                "university": "McGill University", 
+                                "faculty": faculty,
+                                "department": department,
+                                "website": link,
+                                "email": email,
+                                "research_interests": research_interets})
         
         return profiles
     
     def profile_scraper(self, url, department=None):
-        return super().profile_scraper(url, department)
+        page = self.fetch_url(url)
+        if not page:
+            logging.error(f"Failed to fetch {url}")
+            return [], "", ""
+        
+        soup = BeautifulSoup(page, 'html.parser')
+        scrape_with_ai = False
+        research_interests, name, email = [], "", ""
+        
+        if department == "Faculty of Engineering":
+            divs = soup.find_all("div", class_="field-label")
+            research_div = None
+            if not divs:
+                logging.error(f"Failed to scrape {url}, no labels found")
+                return [], "", ""
+
+            name_header = soup.find("div", class_="profile-title")
+            if not name_header:
+                logging.error(f"No name for {url}")
+                return [], "", ""
+            name = name_header.find("h1").text.strip()
+            
+            email_div = soup.find("div", class_="field-type-email")
+            if not email_div:
+                a_tags = soup.find_all("a", href=True)
+                for a in a_tags:
+                    if "mailto" in a["href"]: 
+                        email = a["href"].split(":")[-1]
+                if not email: 
+                    logging.error(f"No email for {url}")
+                    return [], "", ""
+            if not email:
+                username = email_div.find("span", class_="u").text
+                domain = email_div.find("span", class_="d").tex        
+                email = f"{username}@{domain}"
+                        
+            for div in divs:
+                if self.is_research_header(div.text.lower()):
+                    research_div = div
+                    break
+                elif "biography" in div.text.lower():
+                    print("found biography")
+                    research_div = div
+
+            if not research_div:
+                logging.error(f"Failed to find research heading for {url}")
+                return [], "", ""
+            content = research_div.find_next("div", class_="field-items")
+            if not content:
+                logging.error(f"Failed to find content for {url}")
+                return [], "", ""  
+            response = self.ai_scraper.mistral(content.get_text())
+            research_interests = [res.strip() for res in response.split(";")]
+            return research_interests, name, email
+        
+        elif department == "Department of Computer Science":
+            source = self.clean_html(page)
+            if not source:
+                page_source = self.scrape_with_selenium(url)
+                source = self.clean_html(page_source)
+            if not source: 
+                print(f"Empty! {url}")
+                return []
+            response = self.ai_scraper.qwen(source)
+            research_interests = [res.strip() for res in response.split(";")]
+            return research_interests
+        
+    def scrape_with_selenium(self, url):
+        try:
+            self.driver = webdriver.Chrome(
+                service=Service(ChromeDriverManager().install()), 
+                options=self.options)
+            self.driver.get(url)
+        except Exception as e:
+            print(f"Failed to fetch {url}, failure {e}")
+            return []
+        time.sleep(1)
+        page_source = self.driver.page_source
+        self.driver.quit()
+        return page_source
+
+class UBCScraper(Scraper):
+    def __init__(self, university):
+        super().__init__(university)
+        self.options = Options()
+        self.options.add_argument("--headless")
+        self.driver = webdriver.Chrome(
+            service=Service(ChromeDriverManager().install()), 
+            options=self.options)
+
+
+    def directory_scraper(self, url, faculty, department=""):
+        page = self.fetch_url(url)
+        if not page:
+            logging.error(f"Failed to scrape {url}")
+            return []
+        links = []
+        profiles_data = []
+        if faculty == "Faculty of Engineering":
+            page_generator = self.get_next_page(url)
+            for page_source in page_generator:
+                soup = BeautifulSoup(page_source, 'html.parser')
+                profiles = soup.find_all("li", class_="my-atom-4")
+                for li in profiles:
+                    name = ""
+                    department = ""
+                    a = li.find("a", href=True)
+                    if not a:
+                        continue
+                    h3 = a.find_parent()
+                    name = a.get_text(strip=True)
+                    if h3:
+                        p = h3.find_next_sibling("p")
+                        if p:
+                            department = p.get_text(strip=True)
+                            if department == "Engineering (Okanagan campus)":
+                                department = "School of Engineering"
+                    
+                    if "nursing" not in department.lower():
+                        links.append((a["href"], name, department))
+                        
+        for link, name, department in links:
+            logging.info(f"Scraping {name} {link}")
+            res = self.profile_scraper(link)
+            if len(res) == 2:
+                interests, email = res
+                if interests and email:
+                    profiles_data.append({"name": name,
+                                    "university": "University of Ottawa", 
+                                    "faculty": faculty,
+                                    "department": department,
+                                    "website": link,
+                                    "email": email,
+                                    "research_interests": interests})
+
+        return profiles_data
+    
+  
+    def get_next_page(self, url):
+        count = 1
+        try:
+            self.driver.get(url)
+            wait = WebDriverWait(self.driver, 10)
+            while True:
+                logging.info(f"Found page number {count}")
+                count += 1
+                yield self.driver.page_source
+                try:
+                    next_button = wait.until(
+                        EC.element_to_be_clickable((By.CSS_SELECTOR, 'a[rel="next"]'))
+                    )
+                    next_button.click()
+
+                    time.sleep(2)
+                except Exception:
+                    print("No more pages.")
+                    break
+        finally:
+            self.driver.quit()
+    def profile_scraper(self, url, department=None):
+        page = self.fetch_url(url)
+        if not page:
+            logging.error(f"Failed to fetch {url}")
+            return [], ""
+        
+        soup = BeautifulSoup(page, 'html.parser')
+        email = None
+        research_interests = []
+        
+        
+        if soup.find_all("a", href=True):
+            a_tags = soup.find_all("a", href=True)
+            for a in a_tags:
+                if "mailto" in a["href"]:
+                    email = a.get_text(strip=True)
+                    break
+        if soup.find("span", class_="ok-profile-email"):
+            email = soup.find("span", class_="ok-profile-email").find("a").get_text(strip=True)
+        elif soup.find("p", class_="profile--field"):
+            ps = soup.find_all("p", class_="profile--field")
+            for p in ps:
+                a = p.find("a", href=True)
+                if a and "mailto" in a["href"]:
+                    email = a.get_text()
+                    break
+        elif soup.find("div", class_="entry-content"):
+            div = soup.find("div", class_="entry-content")
+            for p in div.find_all("p"):
+                if "Email" in p.get_text(strip=True):
+                    email = p.get_text(strip=True).split("Email:")[-1].strip()
+                elif "email" in p.get_text(strip=True):
+                    email = p.get_text(strip=True).split("email:")[-1].strip()
+            if not email:
+                table = soup.find("table")
+                if table:
+                    for row in table.find_all("tr"):
+                        a = row.find("a", href=True)
+                        if a and "mailto" in a["href"]:
+                            email = a.get_text(strip=True)
+                            break
+
+
+        clean_text = self.clean_html(page)
+        
+        response = self.ai_scraper.qwen(clean_text)
+        research_interests = [res.strip() for res in response.split(";")]
+
+        return research_interests, email

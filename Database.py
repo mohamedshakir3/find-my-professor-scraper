@@ -88,7 +88,7 @@ class Database:
             
         
         for prof in professors:
-            print(f"Processing {prof["name"]}")
+            print(f"Processing {prof['name']}")
             for research_interest in prof.get("research_interests", []):
                 print(f"Processing {research_interest}")
                 embedding = self.generate_embeddings(research_interest)

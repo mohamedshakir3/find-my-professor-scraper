@@ -13,22 +13,16 @@ def main():
     logging.info("Loading university data")
     universities = open("universities.json")
     universities = json.load(universities)
-    factory = ScraperFactory("McGill University", universities["McGill University"])
+    factory = ScraperFactory("University of British Columbia", universities["University of British Columbia"])
     scraper = factory.getScraper()
     data = scraper.run()
-    with open("mcgill.json", "w", encoding="utf-8") as f:
+    with open("ubc.json", "w", encoding="utf-8") as f:
         json.dump(data, f, indent=4, ensure_ascii=False)
     # database = Database()
-    # uoft = open("uoft_clean.json")
-    # uoft = json.load(uoft)
-    # database.update_professors(uoft)
-    # database.update_research_interests("University of Toronto")
-    # mcmaster = open("mcmaster.json")
-    # mcmaster = json.load(mcmaster)
-    # database.update_professors(mcmaster)
-    # database.update_research_interests("McMaster University")
-    # factory = ScraperFactory("McMaster University", universities["University of Waterloo"])
-    
+    # McGill = open("McGill.json")
+    # McGill = json.load(McGill)
+    # database.update_professors(McGill)
+    # database.update_research_interests("McGill University")
     
     
 
