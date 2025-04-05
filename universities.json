@@ -160,6 +160,73 @@
     }
   },
   "University of British Columbia": {
-    "Faculty of Engineering": "https://engineering.ubc.ca/about/faculty-directory"
+    "Faculty of Engineering": "https://engineering.ubc.ca/about/faculty-directory",
+    "Faculty of Science": {
+      "Department of Chemistry": "https://www.chem.ubc.ca/people-directory",
+      "Department of Computer Science": "https://www.cs.ubc.ca/people/faculty",
+      "Department of Earth, Ocean, and Atmospheric Sciences": "https://www.eoas.ubc.ca/people/faculty",
+      "Institute for Resources, Environment, and Sustainability": "https://ires.ubc.ca/personnel/faculty/core-faculty/",
+      "Department of Math": "https://www.math.ubc.ca/about-our-department/directory#quickset-directory2",
+      "Department of Microbology and Immunology": "https://mbim.ubc.ca/faculty",
+      "Department of Physics and Astronomy": "https://phas.ubc.ca/researchers#faculty",
+      "Department of Statistics": "https://www.stat.ubc.ca/people",
+      "Department of Zoology": "https://zoology.ubc.ca/people?group%5B0%5D=1018"
+    }
+  },
+  "University of Montreal": {
+    "Faculty of Engineering": {
+      "Department of Chemical Engineering": "https://www.polymtl.ca/gch/en/contact-information-directories/staff-directory",
+      "Department of Civil, Geological and Mining Engineering": "https://www.polymtl.ca/cgm/coordonn%C3%A9es-et-bottins/bottin-du-personnel",
+      "Department of Electrical Engineering": "https://www.polymtl.ca/ge/coordonnees-et-bottins-0/bottin-du-departement",
+      "Department of Computer and Software Engineering": "https://www.polymtl.ca/gigl/coordonn%C3%A9es-et-bottins/bottin-du-personnel",
+      "Department of Mathematics and Industrial Engineering": "https://www.polymtl.ca/magi/coordonn%C3%A9es-et-bottins/bottin-du-personnel",
+      "Department of Mechanical Engineering": "https://www.polymtl.ca/meca/coordonnees-et-bottins/bottin-du-personnel",
+      "Department of Engineering Physics": "https://www.polymtl.ca/phys/en/contact-information-and-directories/staff-directory",
+      "Department of Biomedical Engineering": "https://www.polymtl.ca/biomed/coordonnees-et-bottin/bottin-du-personnel"
+    }
+  },
+  "University of Alberta": {
+    "Faculty of Engineering": "https://www.ualberta.ca/en/engineering/about/contact-us/find-a-person.html#q=Professor&sort=%40ua__dir_name%20ascending&f:DepartmentFacet=[Civil%20and%20Environmental%20Engineering%20Dept,Mechanical%20Engineering%20Dept,Electrical%20%26%20Computer%20Engineering%20Dept,Chemical%20and%20Materials%20Engineering%20Dept]"
+  },
+  "University of Calgary": {
+    "Schulich School of Engineering": {
+      "Department of Chemical and Petroleum Engineering": "https://schulich.ucalgary.ca/faculty-members",
+      "Department of Biomedical Engineering": "https://schulich.ucalgary.ca/biomedical/faculty-members",
+      "Department of Civil Engineering": "https://schulich.ucalgary.ca/civil/faculty-members",
+      "Department of Electrical and Software Engineering": "https://schulich.ucalgary.ca/electrical-software/faculty-members",
+      "Department of Geomatics Engineering": "https://schulich.ucalgary.ca/geomatics/faculty-members",
+      "Department of Mechanical and Manufacturing Engineering": "https://schulich.ucalgary.ca/mechanical-manufacturing/faculty-members"
+    }
+  },
+  "Queens University": {
+    "Smith Engineering": {
+      "Department of Physics, Engineering Physics and Astronomy": "https://www.queensu.ca/physics/people/people-directory?name=&field_short_description_value=&field_affiliation_target_id=6",
+      "Department of Geological Sciences and Geological Engineering": "https://www.queensu.ca/geol/faculty-research/faculty",
+      "Department of Chemical Engineering": "https://smithengineering.queensu.ca/chee/contact/directory.html",
+      "Department of Civil Engineering": "https://smithengineering.queensu.ca/civil/contact/directory.html",
+      "Department of Electrical and Computer Engineering": "https://smithengineering.queensu.ca/ece/contact/directory.html",
+      "Department of Mathematics and Statistics": "https://www.queensu.ca/mathstat/people/faculty",
+      "Department of Mechanical and Materials Engineering": "https://smithengineering.queensu.ca/mme/contact/directory.html",
+      "Department of Mining Engineering": "https://smithengineering.queensu.ca/mining/contact/directory.html"
+    }
+  },
+  "Western University": {
+    "Faculty of Engineering": {
+      "Department of Chemical and Biochemical Engineering": "https://www.eng.uwo.ca/chemical/people/faculty.html",
+      "Department of Civil and Environmental Engineering": "https://www.eng.uwo.ca/civil/people/faculty.html",
+      "Department of Electrical and Computer Engineering": "https://www.eng.uwo.ca/electrical/people/faculty/index.html",
+      "Department of Mechanical and Materials Engineering": "https://www.eng.uwo.ca/mechanical/people/faculty.html",
+      "School of Biomedical Engineering": "https://www.eng.uwo.ca/biomed/discover/faculty-and-staff.html"
+    }
+  },
+  "Concordia University": {
+    "Gina Cody School of Engineering and Computer Science": {
+      "Department of Building, Civil and Environmental Engineering": "https://www.concordia.ca/ginacody/building-civil-environmental-eng/about/faculty-members.html",
+      "Department of Computer Science and Software Engineering": "https://www.concordia.ca/ginacody/computer-science-software-eng/about/faculty-members.html",
+      "Concordia Institute for Information Systems Engineering": "https://www.concordia.ca/ginacody/info-systems-eng/about/faculty-members.html",
+      "Department of Chemical and Materials Engineering": "https://www.concordia.ca/ginacody/chemical-materials-eng/about/faculty-members.html",
+      "Department of Electrical and Computer Engineering": "https://www.concordia.ca/ginacody/electrical-computer-eng/about/faculty-members.html",
+      "Department of Mechanical, Industrial and Aerospace Engineering": "https://www.concordia.ca/ginacody/mechanical-industrial-aerospace-eng/about/faculty-members.html"
+    }
   }
 }

@@ -97,10 +97,12 @@ class LLMScraper:
         You are an expert in **extracting detailed research interests** from professor biographies.
 
         Given a professor biography, **extract all mentioned research interests** as a concise, **semicolon-separated list**.
-        - **Include all technical terms** and multi-word phrases as they appear.
-        - **Group similar areas** into concise terms but avoid losing details.
+        - **Include all technical terms** and multi-word phrases exactly as they appear.
+        - **Do not split phrases** that naturally belong together (for example, ensure "Gait & Posture" remains intact).
+        - If any HTML entities (like "&amp;") appear, convert them to their correct characters.
+        - **Group similar areas** into concise terms but avoid losing important details.
         - **Do not truncate or oversimplify** complex phrases.
-        - If no explicit research interests are mentioned, return an empty string (no text or explanation).
+        - If no explicit research interests are mentioned, return an empty string (no extra text or explanation).
 
         **Input:**  
         {content}
@@ -108,6 +110,7 @@ class LLMScraper:
         **Output:**  
         A semicolon-separated list of all relevant research interests or an empty string.
         """
+        
 
         response: ChatResponse = chat(
             model="qwen2.5:14b",
@@ -115,7 +118,7 @@ class LLMScraper:
                 {"role": "system", "content": "You are an expert in extracting detailed research interests from professor biographies."},
                 {"role": "user", "content": prompt},
             ],
-            options={"num_ctx": 30000, "temperature": 0.3, "top_p": 0.9}
+            options={"num_ctx": 50000, "temperature": 0.3, "top_p": 0.9}
         )
         return response.message.content
     
@@ -135,6 +138,33 @@ class LLMScraper:
         A semicolon-separated list of summarized research interests or an empty string.
         """
         
+        response: ChatResponse = chat(
+            model = "deepseek-coder:6.7b",
+            messages = [
+                {"role": "system", "content": "You are an expert in extracting and summarizing research interests from professor biographies."},
+                {"role": "user", "content": prompt},
+            ],
+            options = {"num_ctx": 30000, "temperature": 0.1, "top_p": 0.8}
+        )
+        
+        return response.message.content
+
+    def qwen_paraphrase(self, content):
+        prompt = f"""
+        You are an expert in paraphrasing and summarizing research interests.
+
+        Given a research interest, summarize and paraphrase it as much as possible, maintaining technical keywords. If there are multiple interests in one string return a **semicolon-separated list**.
+        - **Preserve important technical terms** and compound phrases
+        - **Avoid duplication** and redundant phrases.
+        - If no explicit research interests are mentioned, return an empty string (no text or explanation).
+
+        **Input:**  
+        {content}
+
+        **Output:**  
+        A semicolon-separated list or individual string of summarized research interests or an empty string.
+        """
+
         response: ChatResponse = chat(
             model = "deepseek-coder:6.7b",
             messages = [
