@@ -1,24 +1,24 @@
 """
-GPU cloud worker for LLM extraction.
+GPU cloud worker for LLM extraction (Asyncio Version).
 
 Reads cloud_input.jsonl (professor markdown exported locally),
 runs structured extraction via llama.cpp server, writes cloud_output.jsonl.
 
 Usage on GPU machine:
-    1. Start llama-server with your model
-    2. python -m pipeline.cloud_worker
-    3. Or: python -m pipeline.cloud_worker --input cloud_input.jsonl --output cloud_output.jsonl --parallel 4
+    1. pip install aiohttp
+    2. Start llama-server with your model (ensure -np matches --parallel)
+    3. python -m pipeline.cloud_worker --input cloud_input.jsonl --output cloud_output.jsonl --parallel 24
 """
 import json
 import os
-import requests
 import time
 import logging
 import sys
 import argparse
-import concurrent.futures
+import asyncio
+import aiohttp
 
-LLAMA_BASE_URL = os.environ.get("LLAMA_BASE_URL", "http://localhost:8080")
+LLAMA_BASE_URL = os.environ.get("LLAMA_BASE_URL", "http://localhost:8000") # Defaulted to 8000 for llama.cpp
 
 EXTRACTION_SCHEMA = {
     "type": "object",
@@ -50,7 +50,6 @@ EXTRACTION_SCHEMA = {
     "required": ["name", "email", "bio", "interests", "accepting_students"]
 }
 
-
 def setup_logger():
     logger = logging.getLogger("CloudWorker")
     logger.setLevel(logging.INFO)
@@ -63,9 +62,7 @@ def setup_logger():
     logger.addHandler(file_handler)
     return logger
 
-
 logger = setup_logger()
-
 
 def _empty_result(prof_id, status="[UNAVAILABLE]"):
     return {
@@ -74,32 +71,33 @@ def _empty_result(prof_id, status="[UNAVAILABLE]"):
         "unique_interests": [],
         "accepting_students": "NA",
         "holistic_profile_string": status,
+        "llm_email": None
     }
 
+async def process_single_row(session, semaphore, data_line, current_idx, total_lines):
+    # The semaphore acts as a strict bottleneck, ensuring we NEVER exceed your --parallel limit
+    async with semaphore:
+        try:
+            data = json.loads(data_line) if isinstance(data_line, str) else data_line
+            prof_id = data["id"]
+            prof_name = data["name"]
+            faculty = data.get("faculty", "")
+            department = data.get("department", "")
+            clean_markdown = data["profile_markdown"]
+        except KeyError as e:
+            logger.error(f"Malformed JSON line, missing key: {e}")
+            return None
 
-def process_single_row(data_line):
-    try:
-        data = json.loads(data_line) if isinstance(data_line, str) else data_line
-        prof_id = data["id"]
-        prof_name = data["name"]
-        faculty = data.get("faculty", "")
-        department = data.get("department", "")
-        clean_markdown = data["profile_markdown"]
-    except KeyError as e:
-        logger.error(f"Malformed JSON line, missing key: {e}")
-        return None
+        if not clean_markdown or clean_markdown in ["[UNAVAILABLE]", "[ERROR]"]:
+            logger.warning(f"Skipping ID {prof_id} ({prof_name}) - Markdown unavailable.")
+            return _empty_result(prof_id)
 
-    if not clean_markdown or clean_markdown in ["[UNAVAILABLE]", "[ERROR]"]:
-        logger.warning(f"Skipping ID {prof_id} ({prof_name}) - Markdown unavailable.")
-        return _empty_result(prof_id)
+        prompt = (
+            f"Extract structured information about Professor {prof_name} "
+            f"from the following profile page content.\n\n"
+            f"Profile:\n{clean_markdown[:10000]}"
+        )
 
-    prompt = (
-        f"Extract structured information about Professor {prof_name} "
-        f"from the following profile page content.\n\n"
-        f"Profile:\n{clean_markdown[:10000]}"
-    )
-
-    try:
         payload = {
             "messages": [
                 {
@@ -113,48 +111,59 @@ def process_single_row(data_line):
                 },
                 {"role": "user", "content": prompt},
             ],
-            "temperature": 0.1,
+            "temperature": 0.0, # Dropped to 0.0 for max speed/determinism
             "response_format": {
                 "type": "json_schema",
                 "json_schema": {"name": "extraction", "strict": True, "schema": EXTRACTION_SCHEMA},
             },
         }
-        resp = requests.post(
-            f"{LLAMA_BASE_URL}/v1/chat/completions",
-            json=payload,
-            timeout=600,
-        )
-        resp.raise_for_status()
-        raw = resp.json()["choices"][0]["message"]["content"]
-        data_out = json.loads(raw)
 
-        interests = [i.strip() for i in data_out.get("interests", []) if i.strip()][:10]
-        bio = data_out.get("bio", "").strip()
-        accepting = data_out.get("accepting_students", "NA")
-        llm_email = data_out.get("email", "").strip()
+        try:
+            # We use aiohttp instead of requests here to keep it entirely asynchronous
+            async with session.post(
+                f"{LLAMA_BASE_URL}/v1/chat/completions",
+                json=payload,
+                timeout=aiohttp.ClientTimeout(total=600)
+            ) as resp:
+                
+                # Catch actual server overload errors before attempting to parse JSON
+                if resp.status != 200:
+                    error_text = await resp.text()
+                    logger.error(f"Server returned {resp.status} for ID {prof_id}. Server said: {error_text}")
+                    return _empty_result(prof_id, "[ERROR]")
 
-        if not interests and not bio:
-            logger.warning(f"ID {prof_id} ({prof_name}) - Empty extraction.")
-            return _empty_result(prof_id)
+                raw_json = await resp.json()
+                raw = raw_json["choices"][0]["message"]["content"]
+                data_out = json.loads(raw)
 
-        kw_str = ", ".join(interests)
-        holistic = f"Professor {prof_name}, {faculty}, {department}. Research interests: {kw_str}."
+                interests = [i.strip() for i in data_out.get("interests", []) if i.strip()][:10]
+                bio = data_out.get("bio", "").strip()
+                accepting = data_out.get("accepting_students", "NA")
+                llm_email = data_out.get("email", "").strip()
 
-        return {
-            "id": prof_id,
-            "bio": bio,
-            "unique_interests": interests,
-            "accepting_students": accepting,
-            "holistic_profile_string": holistic,
-            "llm_email": llm_email if llm_email and llm_email != "NA" else None,
-        }
+                if not interests and not bio:
+                    logger.warning(f"ID {prof_id} ({prof_name}) - Empty extraction.")
+                    return _empty_result(prof_id)
 
-    except Exception as e:
-        logger.error(f"Inference failed for ID {prof_id} ({prof_name}): {e}")
-        return _empty_result(prof_id, "[ERROR]")
+                kw_str = ", ".join(interests)
+                holistic = f"Professor {prof_name}, {faculty}, {department}. Research interests: {kw_str}."
 
+                logger.info(f"[{current_idx}/{total_lines}] ID {prof_id} ({prof_name}) — {len(interests)} interests, accepting={accepting}")
 
-def run_cloud_sprint(input_file="cloud_input.jsonl", output_file="cloud_output.jsonl", parallel=1):
+                return {
+                    "id": prof_id,
+                    "bio": bio,
+                    "unique_interests": interests,
+                    "accepting_students": accepting,
+                    "holistic_profile_string": holistic,
+                    "llm_email": llm_email if llm_email and llm_email != "NA" else None,
+                }
+
+        except Exception as e:
+            logger.error(f"Inference failed for ID {prof_id} ({prof_name}): {e}")
+            return _empty_result(prof_id, "[ERROR]")
+
+async def run_cloud_sprint(input_file="cloud_input.jsonl", output_file="cloud_output.jsonl", parallel=24):
     try:
         with open(input_file, 'r') as f:
             lines = f.readlines()
@@ -162,27 +171,28 @@ def run_cloud_sprint(input_file="cloud_input.jsonl", output_file="cloud_output.j
         logger.critical(f"Input file '{input_file}' not found.")
         return
 
-    logger.info(f"Starting GPU Sprint on {len(lines)} profiles (parallel={parallel})...")
+    total_lines = len(lines)
+    logger.info(f"Starting Async GPU Sprint on {total_lines} profiles (parallel={parallel})...")
     start_time = time.time()
-    results = []
 
-    if parallel <= 1:
-        for i, line in enumerate(lines):
-            result = process_single_row(line)
-            if result:
-                results.append(result)
-                logger.info(f"[{i+1}/{len(lines)}] ID {result['id']} — {len(result['unique_interests'])} interests, accepting={result['accepting_students']}")
-    else:
-        with concurrent.futures.ThreadPoolExecutor(max_workers=parallel) as executor:
-            futures = {executor.submit(process_single_row, line): i for i, line in enumerate(lines)}
-            for future in concurrent.futures.as_completed(futures):
-                idx = futures[future]
-                result = future.result()
-                if result:
-                    results.append(result)
-                    logger.info(f"[{idx+1}/{len(lines)}] ID {result['id']} — {len(result['unique_interests'])} interests")
+    # The semaphore restricts concurrent connections to perfectly match your server capacity
+    semaphore = asyncio.Semaphore(parallel)
+    
+    # We configure the TCPConnector to allow the high parallel limit without throttling
+    connector = aiohttp.TCPConnector(limit=parallel)
+    
+    async with aiohttp.ClientSession(connector=connector) as session:
+        # Fire off all tasks. The semaphore ensures only 'parallel' number run at once.
+        tasks = [
+            process_single_row(session, semaphore, line, i+1, total_lines) 
+            for i, line in enumerate(lines)
+        ]
+        
+        # Wait for everything to finish
+        raw_results = await asyncio.gather(*tasks)
 
-    # Sort by ID for deterministic output
+    # Filter out Nones and sort
+    results = [r for r in raw_results if r is not None]
     results.sort(key=lambda r: r["id"])
 
     try:
@@ -198,12 +208,12 @@ def run_cloud_sprint(input_file="cloud_input.jsonl", output_file="cloud_output.j
     logger.info(f"Done! {len(results)} profiles in {elapsed:.1f}s ({rate:.1f} profiles/sec)")
     logger.info(f"Output: {output_file}")
 
-
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="GPU cloud worker for LLM extraction")
+    parser = argparse.ArgumentParser(description="Async GPU cloud worker for LLM extraction")
     parser.add_argument("--input", default="cloud_input.jsonl", help="Input JSONL file")
     parser.add_argument("--output", default="cloud_output.jsonl", help="Output JSONL file")
-    parser.add_argument("--parallel", type=int, default=1, help="Parallel requests to llama-server")
+    parser.add_argument("--parallel", type=int, default=24, help="Parallel requests to llama-server")
     args = parser.parse_args()
 
-    run_cloud_sprint(args.input, args.output, args.parallel)
+    # Execute the async event loop
+    asyncio.run(run_cloud_sprint(args.input, args.output, args.parallel))
