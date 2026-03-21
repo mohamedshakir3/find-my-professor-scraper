@@ -167,7 +167,7 @@
       "Department of Earth, Ocean, and Atmospheric Sciences": "https://www.eoas.ubc.ca/people/faculty",
       "Institute for Resources, Environment, and Sustainability": "https://ires.ubc.ca/personnel/faculty/core-faculty/",
       "Department of Math": "https://www.math.ubc.ca/about-our-department/directory#quickset-directory2",
-      "Department of Microbology and Immunology": "https://mbim.ubc.ca/faculty",
+      "Department of Microbiology and Immunology": "https://mbim.ubc.ca/people",
       "Department of Physics and Astronomy": "https://phas.ubc.ca/researchers#faculty",
       "Department of Statistics": "https://www.stat.ubc.ca/people",
       "Department of Zoology": "https://zoology.ubc.ca/people?group%5B0%5D=1018"
@@ -189,7 +189,7 @@
     "Faculty of Engineering": "https://www.ualberta.ca/en/engineering/about/contact-us/find-a-person.html#q=Professor&sort=%40ua__dir_name%20ascending&f:DepartmentFacet=[Civil%20and%20Environmental%20Engineering%20Dept,Mechanical%20Engineering%20Dept,Electrical%20%26%20Computer%20Engineering%20Dept,Chemical%20and%20Materials%20Engineering%20Dept]"
   },
   "University of Calgary": {
-    "Schulich School of Engineering": {
+    "Faculty of Engineering": {
       "Department of Chemical and Petroleum Engineering": "https://schulich.ucalgary.ca/faculty-members",
       "Department of Biomedical Engineering": "https://schulich.ucalgary.ca/biomedical/faculty-members",
       "Department of Civil Engineering": "https://schulich.ucalgary.ca/civil/faculty-members",
@@ -199,7 +199,7 @@
     }
   },
   "Queens University": {
-    "Smith Engineering": {
+    "Faculty of Engineering": {
       "Department of Physics, Engineering Physics and Astronomy": "https://www.queensu.ca/physics/people/people-directory?name=&field_short_description_value=&field_affiliation_target_id=6",
       "Department of Geological Sciences and Geological Engineering": "https://www.queensu.ca/geol/faculty-research/faculty",
       "Department of Chemical Engineering": "https://smithengineering.queensu.ca/chee/contact/directory.html",
@@ -220,7 +220,7 @@
     }
   },
   "Concordia University": {
-    "Gina Cody School of Engineering and Computer Science": {
+    "Faculty of Engineering": {
       "Department of Building, Civil and Environmental Engineering": "https://www.concordia.ca/ginacody/building-civil-environmental-eng/about/faculty-members.html",
       "Department of Computer Science and Software Engineering": "https://www.concordia.ca/ginacody/computer-science-software-eng/about/faculty-members.html",
       "Concordia Institute for Information Systems Engineering": "https://www.concordia.ca/ginacody/info-systems-eng/about/faculty-members.html",

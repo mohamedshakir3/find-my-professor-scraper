@@ -2,3 +2,9 @@
 __pycache__
 venv/
 data-dumps/
+*.log
+*.jsonl
+*.csv
+*.xlsx
+*.db
+*.jsonl

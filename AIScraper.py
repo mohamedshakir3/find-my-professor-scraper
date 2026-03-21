@@ -15,34 +15,35 @@ class LLMScraper:
     INSTRUCTION_TO_LLM = "Extract the research interests from the professors profile. Place each professors' research interests as an object with that data."
 
     def __init__(self):
+        pass
         """Initialize LLM Scraper with config"""
-        self.deepseek = OpenAI(
-            api_key=os.getenv("DEEPSEEK_API"),
-            base_url="https://api.deepseek.com")
-        self.llm_strategy = LLMExtractionStrategy(
-            llm_config=LLMConfig(
-                provider="deepseek/deepseek-chat",
-                api_token=os.getenv("DEEPSEEK_API")
-            ),
-            schema=Professor.model_json_schema(),
-            extraction_type="schema",
-            instruction=self.INSTRUCTION_TO_LLM,
-            chunk_token_threshold=1000,
-            overlap_rate=0.0,
-            apply_chunking=True,
-            input_format="markdown",
-            extra_args={"temperature": 0.0, "max_tokens": 2500}
-        )
+        # self.deepseek = OpenAI(
+        #     api_key=os.getenv("DEEPSEEK_API"),
+        #     base_url="https://api.deepseek.com")
+        # self.llm_strategy = LLMExtractionStrategy(
+        #     llm_config=LLMConfig(
+        #         provider="deepseek/deepseek-chat",
+        #         api_token=os.getenv("DEEPSEEK_API")
+        #     ),
+        #     schema=Professor.model_json_schema(),
+        #     extraction_type="schema",
+        #     instruction=self.INSTRUCTION_TO_LLM,
+        #     chunk_token_threshold=1000,
+        #     overlap_rate=0.0,
+        #     apply_chunking=True,
+        #     input_format="markdown",
+        #     extra_args={"temperature": 0.0, "max_tokens": 2500}
+        # )
 
-        self.crawl_config = CrawlerRunConfig(
-            extraction_strategy=self.llm_strategy,
-            cache_mode=CacheMode.BYPASS,
-            process_iframes=False,
-            remove_overlay_elements=True,
-            exclude_external_links=True
-        )
+        # self.crawl_config = CrawlerRunConfig(
+        #     extraction_strategy=self.llm_strategy,
+        #     cache_mode=CacheMode.BYPASS,
+        #     process_iframes=False,
+        #     remove_overlay_elements=True,
+        #     exclude_external_links=True
+        # )
 
-        self.browser_cfg = BrowserConfig(headless=True, verbose=True)
+        # self.browser_cfg = BrowserConfig(headless=True, verbose=True)
 
     def scrape(self, url):
         """Run async scrape in a synchronous way"""
@@ -110,7 +111,6 @@ class LLMScraper:
         **Output:**  
         A semicolon-separated list of all relevant research interests or an empty string.
         """
-        
 
         response: ChatResponse = chat(
             model="qwen2.5:14b",
@@ -118,10 +118,89 @@ class LLMScraper:
                 {"role": "system", "content": "You are an expert in extracting detailed research interests from professor biographies."},
                 {"role": "user", "content": prompt},
             ],
-            options={"num_ctx": 50000, "temperature": 0.3, "top_p": 0.9}
+            options={"num_ctx": 50000, "temperature": 0}
         )
         return response.message.content
     
+    def qwen2(self, content):
+        system = "You are an expert extractor.  When asked for a semicolon-separated list, you MUST output only the list items, separated by semicolons, with NO markdown, NO code fences, NO commentary, and NO quotes.  If there are no items, output an empty string. /nothink"
+        user = f"""Extract all research interests (exact phrases) from the following HTML/text.  Output only a semicolon-separated list:
+
+        {content}
+        """
+        response: ChatResponse = chat(
+            model="qwen2.5:7b",
+            messages=[
+                {"role": "system", "content": system},
+                {"role": "user", "content": user},
+            ],
+            options={"num_ctx": 50000, "temperature": 0.1}
+        )
+        return response.message.content.strip()
+    
+    def qwen3(self, content):
+        prompt = f"""
+        You are an expert in **extracting detailed research interests** from professor biographies.
+
+        Given a professor biography, **extract all mentioned research interests** as a concise, **semicolon-separated list**.
+        - **Include all technical terms** and multi-word phrases exactly as they appear.
+        - **Do not split phrases** that naturally belong together (for example, ensure "Gait & Posture" remains intact).
+        - If any HTML entities (like "&amp;") appear, convert them to their correct characters.
+        - **Group similar areas** into concise terms but avoid losing important details.
+        - **Do not truncate or oversimplify** complex phrases.
+        - If no explicit research interests are mentioned, return an empty string (no extra text or explanation).
+        - Combine and summarize the text/bio in no more than 10 research interests
+
+        **Input:**  
+        {content}
+
+        **Output:**  
+        A semicolon-separated list of all relevant research interests or an empty string.
+        """
+        response = chat(
+            model="qwen2.5:7b",
+            messages=[
+                {"role": "system", "content": "You are an expert in extracting detailed research interests from professor biographies. /no_think"},
+                {"role": "user",   "content": prompt.strip()},
+            ],
+            options={"num_ctx": 50000, "temperature": 0.1}
+        )
+        return response.message.content.strip()
+
+    def qwen3_post_process(self, raw_str: str) -> list[str]:
+        system_prompt = """
+        You are a data-cleaning assistant.  You receive a JSON array of possible research interests extracted by another model.  Your job is to:
+        1. Remove any entry that is:
+            • Longer than 10 words
+            • Contains a 4-digit year or biographical verbs (“received”, “taught”, “joined”)
+            • Is a known country name (e.g. “United States”, “Canada”)
+            • Is all-caps with more than one word
+            • Contains markdown characters (like underscores, asterisks)
+        2. Trim whitespace and punctuation; normalize casing (title case or sentence case).
+        3. Deduplicate, preserving original order.
+        4. Return a JSON array of cleaned strings, nothing else.
+        """
+        raw_list = [item.strip() for item in raw_str.split(";") if item.strip()]
+        clean_prompt = f"""
+        Here is the raw list:
+        {json.dumps(raw_list)}
+        """
+        response = chat(
+            model="qwen3:4b",
+            messages=[
+                {"role": "system", "content": system_prompt.strip()},
+                {"role": "user",   "content": clean_prompt.strip()},
+            ],
+            options={"num_ctx": 50000, "temperature": 0.1}
+        )
+        try:
+            cleaned = json.loads(response.message.content)
+            if isinstance(cleaned, list):
+                return cleaned
+        except json.JSONDecodeError:
+            pass
+        return raw_list
+        
     def deepseek_coder(self, content):
         prompt = f"""
         You are an expert in extracting and summarizing research interests from professor biographies.

@@ -12,6 +12,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.chrome.options import Options
 import logging
 import time
+import html
 from selenium.webdriver.support.ui import Select
 
 logger = logging.getLogger(__name__)
@@ -36,6 +37,37 @@ class Scraper(ABC):
             return None
 
         return response.text
+
+    def clean_interests(self, raw: str) -> list[str]:
+        text = re.sub(r"```.*?```", "", raw, flags=re.S)
+        text = re.sub(r"(^>+)", "", text, flags=re.M).strip()
+        text = html.unescape(text)
+        parts = [p.strip().strip('"') for p in text.split(";")]
+        seen = set()
+        clean = []
+        for p in parts:
+            if p and p not in seen:
+                seen.add(p)
+                clean.append(p)
+        return clean
+
+    def filter_interests(self, interests: list[str]) -> list[str]:
+        cleaned = []
+        for item in interests:
+            text = item.strip()
+
+            if text in ("", '""'):
+                continue
+            if (text.count('.') >= 1 and len(text.split()) > 8) or len(text.split()) > 20:
+                continue
+            if re.fullmatch(r"[A-Z][a-z]{1,20}", text):
+                continue
+            if "  " in text and ";" not in text:
+                text = re.sub(r"([a-z]) ([A-Z])", r"\1; \2", text)
+
+            if text not in cleaned:
+                cleaned.append(text)
+        return cleaned
             
 
     def decode_email(self, protected_url):
@@ -83,7 +115,8 @@ class Scraper(ABC):
                         self.directory_scraper(
                             self.university[faculty][department],
                             faculty, department))
-
+                    break
+            break
         self.cleanup()
 
         return profile_data
@@ -110,8 +143,9 @@ class uOttawaScraper(Scraper):
                 if a["href"] in visited:
                     continue
                 research_interests, email, name = self.profile_scraper(a["href"])
+                visited.add(a["href"])
                 if not research_interests:
-                    research_interests = self.ai_scraper.scrape(a["href"])
+                    print(f'Skipping {a["href"]}')
                 if research_interests:
                     profiles.append({"name": name,
                                 "university": "University of Ottawa", 
@@ -140,14 +174,22 @@ class uOttawaScraper(Scraper):
                 email = email_link["href"].split(":")[-1]
                 email = self.decode_email(email_link["href"])
         
-        research_heading = soup.find('h2', string="Research interests")
         research_interests = []
+        research_heading = soup.find("h2", string="Research interests")
         if research_heading:
-            container = research_heading.find_parent('section').find_next_sibling('section')
-            if container:
-                ul = container.find('ul')
-                if ul:
-                    research_interests = [li.text.strip() for li in ul.find_all('li')]
+            container = research_heading.find_parent("section")\
+                                        .find_next_sibling("section")
+            ul = container.find("ul") if container else None
+        else:
+            ul = None
+
+        if ul:
+            raw = self.ai_scraper.qwen2(str(ul))
+        else:
+            bio = soup.find("section", class_="uottawa-paragraph-padding")
+            raw = self.ai_scraper.qwen2(str(bio)) if bio else ""
+        print(raw)
+        research_interests = self.ai_scraper.qwen3_post_process(raw)
         return research_interests, email, name
 
 
@@ -222,17 +264,26 @@ class CarletonScraper(Scraper):
             research_header = soup.find(lambda tag:tag.name in ["h1", "h2", "h3", "h4", "h5", "h6"] and "research" in tag.text.lower())
             if research_header.find_next_sibling('ul'):
                 ul = research_header.find_next_sibling('ul')
-                interests = [li.get_text(strip=True) for li in ul.find_all("li")]
+                interests_text = self.ai_scraper.qwen(str(ul))
+                interests = [interest.strip() 
+                            for interest in interests_text.split(';')
+                            if interest.strip()]
         elif soup.find(lambda tag:tag.name=="strong" and "research interests" in tag.text.lower()):
             research_header = soup.find(lambda tag:tag.name=="strong" and "research interests" in tag.text.lower())
             ul = research_header.find_parent('p').find_next_sibling("ul")
             if ul:
-                interests = [li.get_text(strip=True) for li in ul.find_all("li")]
+                interests_text = self.ai_scraper.qwen(str(ul))
+                interests = [interest.strip() 
+                            for interest in interests_text.split(';')
+                            if interest.strip()]
         elif soup.find(lambda tag:tag.name=="b" and "research interests" in tag.text.lower()):
             research_header = soup.find(lambda tag:tag.name=="b" and "research interests" in tag.text.lower())
             ul = research_header.find_parent('p').find_next_sibling("ul")
             if ul:
-                interests = [li.get_text(strip=True) for li in ul.find_all("li")]
+                interests_text = self.ai_scraper.qwen(str(ul))
+                interests = [interest.strip() 
+                            for interest in interests_text.split(';')
+                            if interest.strip()]
         
         email = ""
         name = ""        
@@ -311,7 +362,10 @@ class CarletonScraper(Scraper):
                     research_header = soup.find(lambda tag:tag.name in ["h1", "h2", "h3", "h4", "h5", "h6"] and "research" in tag.text.lower())
                     if research_header.find_next_sibling('ul'):
                         ul = research_header.find_next_sibling('ul')
-                        interests = [li.get_text(strip=True) for li in ul.find_all("li")]
+                        interests_text = self.ai_scraper.qwen(str(ul))
+                        interests = [interest.strip() 
+                                    for interest in interests_text.split(';')
+                                    if interest.strip()]
 
             return interests, email, name
 
@@ -626,7 +680,8 @@ class uoftScraper(Scraper):
                     logging.error("Did not find faculty directory")
                     return []
                 links.extend(
-                    [a["href"] for a in div.find_all("a", class_="pp-post-link", href=True)]
+                    [a["href"] for a in div.find_all("a", class_="pp-post-link", 
+                                                        href=True)]
                 )
                 if not page:
                     logging.error(f"Failed to find next page {a['href']}")
