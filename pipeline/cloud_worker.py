@@ -111,7 +111,12 @@ async def process_single_row(session, semaphore, data_line, current_idx, total_l
                 },
                 {"role": "user", "content": prompt},
             ],
-            "temperature": 0.0, # Dropped to 0.0 for max speed/determinism
+            "temperature": 1.0,
+            "top_p": 1.0,
+            "top_k": 20,
+            "min_p": 0.0,
+            "presence_penalty": 2.0,
+            "repetition_penalty": 1.0,
             "response_format": {
                 "type": "json_schema",
                 "json_schema": {"name": "extraction", "strict": True, "schema": EXTRACTION_SCHEMA},
