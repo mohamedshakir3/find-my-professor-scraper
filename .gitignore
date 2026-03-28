@@ -2,9 +2,14 @@
 __pycache__
 venv/
 data-dumps/
+new_dumps/
+gpu_inputs/
+model.ini
+embed_new.py
+import_new_dumps.py
+import_ubc.py
 *.log
 *.jsonl
 *.csv
 *.xlsx
 *.db
-*.jsonl

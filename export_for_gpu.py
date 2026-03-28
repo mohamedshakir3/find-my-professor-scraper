@@ -7,10 +7,14 @@ no GPU needed), and writes a JSONL file ready for the cloud worker.
 Usage:
     python export_for_gpu.py --university "McGill University"
     python export_for_gpu.py --university "McGill University" --limit 50 --delay 1.0
+    python export_for_gpu.py --all                            # export each university to its own file
+    python export_for_gpu.py --all --delay 2.0
 """
 import argparse
 import json
 import logging
+import os
+import re
 import sys
 import time
 
@@ -28,7 +32,29 @@ logging.basicConfig(
 )
 logger = logging.getLogger("export_for_gpu")
 
-OUTPUT_FILE = "cloud_input.jsonl"
+OUTPUT_DIR = "gpu_inputs"
+
+
+def slugify(name: str) -> str:
+    """Turn 'University of Ottawa' into 'university_of_ottawa'."""
+    return re.sub(r'[^a-z0-9]+', '_', name.lower()).strip('_')
+
+
+def output_path(university: str | None) -> str:
+    os.makedirs(OUTPUT_DIR, exist_ok=True)
+    if university:
+        return os.path.join(OUTPUT_DIR, f"{slugify(university)}.jsonl")
+    return os.path.join(OUTPUT_DIR, "all.jsonl")
+
+
+def fetch_university_names() -> list[str]:
+    conn = get_connection()
+    try:
+        with conn.cursor() as cur:
+            cur.execute("SELECT DISTINCT university FROM professors WHERE website IS NOT NULL ORDER BY university")
+            return [row[0] for row in cur.fetchall()]
+    finally:
+        put_connection(conn)
 
 
 def fetch_professors(university: str | None = None, limit: int = 10000) -> list[dict]:
@@ -90,11 +116,12 @@ def process_one(row: dict, processor: ProfileProcessor, max_retries: int = 3) ->
                 "profile_markdown": markdown,
             }
 
-        except ProfileProcessor.RateLimitError:
+        except (ProfileProcessor.RateLimitError, ProfileProcessor.ThrottledError) as e:
             # Double the global delay (cap at 30s) and wait before retrying
             _state["current_delay"] = min(30.0, _state["current_delay"] * 2)
             wait = _state["current_delay"] * (attempt + 1)
-            logger.warning(f"  [{prof_id}] {name} — 429, waiting {wait:.0f}s, global delay now {_state['current_delay']:.1f}s (attempt {attempt+1}/{max_retries})")
+            kind = "429" if isinstance(e, ProfileProcessor.RateLimitError) else "connection reset"
+            logger.warning(f"  [{prof_id}] {name} — {kind}, waiting {wait:.0f}s, global delay now {_state['current_delay']:.1f}s (attempt {attempt+1}/{max_retries})")
             time.sleep(wait)
         except Exception as e:
             logger.error(f"  [{prof_id}] {name} — error: {e}")
@@ -104,11 +131,11 @@ def process_one(row: dict, processor: ProfileProcessor, max_retries: int = 3) ->
     return None
 
 
-def load_existing_ids() -> set[int]:
+def load_existing_ids(filepath: str) -> set[int]:
     """Load IDs already exported so we can resume."""
     try:
         ids = set()
-        with open(OUTPUT_FILE, "r") as f:
+        with open(filepath, "r") as f:
             for line in f:
                 if line.strip():
                     ids.add(json.loads(line)["id"])
@@ -118,13 +145,14 @@ def load_existing_ids() -> set[int]:
 
 
 def run_export(university: str | None, limit: int, delay: float):
+    out_file = output_path(university)
     rows = fetch_professors(university, limit)
     if not rows:
         logger.error("No professors found.")
         return
 
     # Resume support — skip already exported professors
-    done_ids = load_existing_ids()
+    done_ids = load_existing_ids(out_file)
     if done_ids:
         logger.info(f"Resuming — {len(done_ids)} already exported, skipping them")
         rows = [r for r in rows if r["id"] not in done_ids]
@@ -132,14 +160,14 @@ def run_export(university: str | None, limit: int, delay: float):
             logger.info("All professors already exported!")
             return
 
-    logger.info(f"Fetching HTML for {len(rows)} professors (initial delay={delay}s)...")
+    logger.info(f"Fetching HTML for {len(rows)} professors → {out_file} (initial delay={delay}s)...")
     processor = ProfileProcessor()
     _state["current_delay"] = delay
     ok_streak = 0
     ok_count = 0
 
     # Append mode so we don't overwrite previous progress
-    with open(OUTPUT_FILE, "a") as f:
+    with open(out_file, "a") as f:
         for i, row in enumerate(rows, 1):
             result = process_one(row, processor)
 
@@ -161,19 +189,25 @@ def run_export(university: str | None, limit: int, delay: float):
 
             time.sleep(_state["current_delay"])
 
-    logger.info(f"Exported {ok_count}/{len(rows)} professors to {OUTPUT_FILE}")
-    close_pool()
+    logger.info(f"Exported {ok_count}/{len(rows)} professors to {out_file}")
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Export professor markdown for GPU processing")
-    parser.add_argument("--university", type=str, default=None, help="Filter to one university")
-    parser.add_argument("--limit", type=int, default=10000, help="Max professors to export")
+    group = parser.add_mutually_exclusive_group()
+    group.add_argument("--university", type=str, default=None, help="Filter to one university")
+    group.add_argument("--all", action="store_true", help="Export each university to its own file")
+    parser.add_argument("--limit", type=int, default=10000, help="Max professors per university")
     parser.add_argument("--delay", type=float, default=0.5, help="Seconds between requests (default 0.5)")
     args = parser.parse_args()
 
-    run_export(
-        university=args.university,
-        limit=args.limit,
-        delay=args.delay,
-    )
+    if args.all:
+        universities = fetch_university_names()
+        logger.info(f"Exporting {len(universities)} universities to {OUTPUT_DIR}/")
+        for uni in universities:
+            logger.info(f"\n{'='*60}\n  {uni}\n{'='*60}")
+            run_export(university=uni, limit=args.limit, delay=args.delay)
+    else:
+        run_export(university=args.university, limit=args.limit, delay=args.delay)
+
+    close_pool()

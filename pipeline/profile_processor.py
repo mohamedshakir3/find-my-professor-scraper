@@ -238,6 +238,10 @@ class ProfileProcessor:
         """Raised when the server returns 429 Too Many Requests."""
         pass
 
+    class ThrottledError(Exception):
+        """Raised on connection resets or similar throttling signals."""
+        pass
+
     def _fetch_html(self, url: str, timeout: int = 30) -> Optional[str]:
         """Fetch HTML with a hard timeout to prevent indefinite hangs."""
         import requests
@@ -251,8 +255,10 @@ class ProfileProcessor:
                 raise self.RateLimitError(f"429 Too Many Requests for {url}")
             resp.raise_for_status()
             return resp.text
-        except self.RateLimitError:
-            raise  # re-raise so orchestrator can handle
+        except (self.RateLimitError, self.ThrottledError):
+            raise
+        except ConnectionError as e:
+            raise self.ThrottledError(f"Connection reset for {url}: {e}") from e
         except Exception as e:
             logger.warning(f"Failed to fetch {url}: {e}")
             return None
