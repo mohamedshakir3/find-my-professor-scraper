@@ -228,5 +228,112 @@
       "Department of Electrical and Computer Engineering": "https://www.concordia.ca/ginacody/electrical-computer-eng/about/faculty-members.html",
       "Department of Mechanical, Industrial and Aerospace Engineering": "https://www.concordia.ca/ginacody/mechanical-industrial-aerospace-eng/about/faculty-members.html"
     }
+  },
+  "Simon Fraser University": {
+    "Faculty of Applied Sciences": {
+      "School of Computing Science": "https://www.sfu.ca/fas/computing/people/faculty.html",
+      "School of Engineering Science": "https://www.sfu.ca/fas/schools/engineering-science/faculty.html",
+      "School of Mechatronic Systems Engineering": "https://www.sfu.ca/fas/schools/mechatronic-systems-engineering/faculty.html",
+      "School of Sustainable Energy Engineering": "https://www.sfu.ca/fas/schools/sustainable-energy-engineering/faculty.html"
+    }
+  },
+  "Memorial University of Newfoundland": {
+    "Faculty of Engineering and Applied Science": {
+      "Department of Civil Engineering": "https://www.mun.ca/engineering/civil/about-us/our-people/",
+      "Department Electrical and Computer Engineering": "https://www.mun.ca/engineering/ece/about-us/our-people/",
+      "Department of Mechanical and Mechatronics Engineering": "https://www.mun.ca/engineering/mech/about-us/our-people/",
+      "Department of Ocean and Naval Architectural Engineering": "https://www.mun.ca/engineering/ona/about-us/our-people/"
+    }
+  },
+  "Dalhousie University": {
+    "Faculty of Computer Science": "https://www.dal.ca/faculty/computerscience/faculty-staff.html",
+    "Faculty of Engineering": {
+      "Department of Civil and Resource Engineering": "https://www.dal.ca/faculty/engineering/civil-resource/faculty-staff/our-faculty.html",
+      "Department of Electrical and Computer Engineering": "https://www.dal.ca/faculty/engineering/electrical/faculty-staff/our-faculty.html",
+      "Department of Industrial Engineering": "https://www.dal.ca/faculty/engineering/industrial/faculty-staff/our-faculty1.html",
+      "Department of Mechanical Engineering": "https://www.dal.ca/faculty/engineering/mechanical/faculty-staff/our-faculty.html",
+      "Department of Process Engineering and Applied Science": "https://www.dal.ca/faculty/engineering/peas/faculty-staff/our-faculty.html"
+    }
+  },
+  "University of Manitoba": {
+    "Faculty of Engineering": {
+      "Department of Biosystems Engineering": "https://umanitoba.ca/engineering/faculty-staff/biosystems-engineering",
+      "Department of Civil Engineering": "https://umanitoba.ca/engineering/faculty-staff/civil-engineering",
+      "Department of Electrical and Computer Engineering": "https://umanitoba.ca/engineering/faculty-staff/electrical-and-computer-engineering-faculty-and-staff",
+      "Department of Mechanical Engineering": "https://umanitoba.ca/engineering/faculty-staff/mechanical-engineering"
+    },
+    "Faculty of Science": {
+      "Department of Biological Sciences": "https://umanitoba.ca/science/directory/biological-sciences",
+      "Department of Chemistry": "https://umanitoba.ca/science/directory/chemistry",
+      "Department of Computer Science": "https://umanitoba.ca/science/directory/computer-science",
+      "Department of Mathematics": "https://umanitoba.ca/science/directory/mathematics",
+      "Department of Microbiology": "https://umanitoba.ca/science/directory/microbiology",
+      "Department of Physics and Astronomy": "https://umanitoba.ca/science/directory/physics-and-astronomy",
+      "Department of Statistics": "https://umanitoba.ca/science/directory/statistics"
+    }
+  },
+  "University of Saskatchewan": {
+    "College of Engineering": {
+      "Department of Chemical & Biological": "https://engineering.usask.ca/contact_info/chembio-faculty-list.php",
+      "Department of Civil, Geological and Environmental": "https://engineering.usask.ca/contact_info/cge-people-list.php",
+      "Department of Electrical & Computer Engineering": "https://engineering.usask.ca/contact_info/ece-faculty-staff-list.php",
+      "Department of Mechanical Engineering": "https://engineering.usask.ca/contact_info/mech-faculty-staff-list.php"
+    },
+    "College of Art and Science": {
+      "Department of Biology": "https://artsandscience.usask.ca/biology/people/index.php",
+      "Department of Chemistry": "https://artsandscience.usask.ca/chemistry/people/index.php",
+      "Department of Computer Science": "https://www.cs.usask.ca/people/faculty.php",
+      "Department of Economics": "https://artsandscience.usask.ca/economics/people/index.php",
+      "Department of Geological Sciences": "https://artsandscience.usask.ca/geology/people/index.php",
+      "Department of Mathematics and Statistics": "https://artsandscience.usask.ca/math/people/index.php",
+      "Department of Physics and Engineering Physics": "https://artsandscience.usask.ca/physics/people/index.php"
+    }
+  },
+  "York University": {
+    "Lassonde School of Engineering": {
+      "Department of Civil Engineering": "https://lassonde.yorku.ca/faculty?type=civil-engineering",
+      "Department of Earth and Space Science and Engineering": "https://lassonde.yorku.ca/faculty?type=earth-space-science-engineering",
+      "Department of Mechanical Engineering": "https://lassonde.yorku.ca/faculty?type=mechanical-engineering",
+      "Department of Electrical Engineering and Computer Science": "https://lassonde.yorku.ca/faculty?type=electrical-engineering-computer-science"
+    },
+    "Faculty of Science": {
+      "Department of Biology": "https://www.yorku.ca/science/profiles/biology/",
+      "Department of Chemistry": "https://www.yorku.ca/science/profiles/chemistry/",
+      "Department of Mathematics and Statistics": "https://www.yorku.ca/science/profiles/mathematics-statistics/",
+      "Department of Physics and Astronomy": "https://www.yorku.ca/science/profiles/physics-and-astronomy/people/pa-department-faculty/",
+      "Department of Science, Technology and Society": "https://www.yorku.ca/science/profiles/sts-nats/"
+    }
+  },
+  "University of Victoria": {
+    "Faculty of Engineering and Computer Science": {
+      "Deparment of Civil Engineering": "https://www.uvic.ca/ecs/civil/people/index.php",
+      "Deparment of Electrical and Computer Engineering": "https://www.uvic.ca/ecs/ece/faculty-and-staff/home/faculty/index.php",
+      "Deparment of Computer Science": "https://www.uvic.ca/ecs/computerscience/people/faculty/index.php",
+      "Deparment of Mechanical Engineering": "https://www.uvic.ca/ecs/mechanical/faculty-staff/index.php#ipn-faculty"
+    },
+    "Faculty of Science": {
+      "Department of Biochemistry and Microbiology": "https://www.uvic.ca/science/biochem/people/faculty/index.php",
+      "Department of Biology": "https://www.uvic.ca/science/biology/people/index.php",
+      "Department of Chemistry": "https://www.uvic.ca/science/chemistry/people/faculty/index.php",
+      "Department of Earth and Ocean Sciences": "https://www.uvic.ca/science/seos/people/faculty/index.php",
+      "Department of Mathematics and Statistics": "https://www.uvic.ca/science/math-statistics/people/home/faculty/index.php",
+      "Department of Physics and Astronomy": "https://www.uvic.ca/science/physics/people/people/faculty/index.php"
+    }
+  },
+  "Toronto Metropolitan University": {
+    "Faculty of Engineering and Architectural Science": {
+      "Department of Aerospace Engineering": "https://www.torontomu.ca/aerospace/people/faculty/",
+      "Department of Architectural Science": "https://www.torontomu.ca/architectural-science/people/faculty/",
+      "Department of Chemical Engineering": "https://www.torontomu.ca/chemical/people/faculty/",
+      "Department of Civil Engineering": "https://www.torontomu.ca/civil/people/faculty/",
+      "Department of Electrical, Computer, and Biomedical Engineering": "https://www.torontomu.ca/electrical-computer-biomedical/people/faculty/",
+      "Department of Mechanical, Industrial, and Mechatronics Engineering": "https://www.torontomu.ca/mechanical-industrial-mechatronics/people/faculty/"
+    },
+    "Faculty of Science": {
+      "Department of Chemistry and Biology": "https://www.torontomu.ca/chemistry-biology/our-people/",
+      "Department of Computer Science": "https://www.torontomu.ca/cs/our-people/",
+      "Department of Mathematics": "https://www.torontomu.ca/math/our-people/",
+      "Department of Physics": "https://www.torontomu.ca/physics/our-people/"
+    }
   }
 }

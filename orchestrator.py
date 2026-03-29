@@ -21,6 +21,7 @@ from scraper.universities.uoft import UofTDirectoryScraper
 from scraper.universities.ubc import UBCDirectoryScraper
 from scraper.universities.ualberta import UAlbertaDirectoryScraper
 from scraper.universities.ucalgary import UCalgaryDirectoryScraper
+from scraper.universities.generic import GenericDirectoryScraper  # works on any directory page
 
 from scraper.pipeline.profile_processor import ProfileProcessor
 from scraper.pipeline.embedder import embed_text
@@ -52,6 +53,14 @@ SCRAPER_REGISTRY: Dict[str, Type[BaseDirectoryScraper]] = {
     "University of British Columbia": UBCDirectoryScraper,
     "University of Alberta": UAlbertaDirectoryScraper,
     "University of Calgary": UCalgaryDirectoryScraper,
+    "Simon Fraser University": GenericDirectoryScraper,
+    "Memorial University of Newfoundland": GenericDirectoryScraper,
+    "Dalhousie University": GenericDirectoryScraper,
+    "University of Manitoba": GenericDirectoryScraper,
+    "University of Saskatchewan": GenericDirectoryScraper,
+    "York University": GenericDirectoryScraper,
+    "University of Victoria": GenericDirectoryScraper,
+    "Toronto Metropolitan University": GenericDirectoryScraper,
 }
 
 class ScraperOrchestrator:
