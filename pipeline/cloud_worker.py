@@ -64,9 +64,9 @@ def setup_logger():
 
 logger = setup_logger()
 
-def _empty_result(prof_id, status="[UNAVAILABLE]"):
+def _empty_result(record_key, key_field="id", status="[UNAVAILABLE]"):
     return {
-        "id": prof_id,
+        key_field: record_key,
         "bio": None,
         "unique_interests": [],
         "accepting_students": "NA",
@@ -79,7 +79,13 @@ async def process_single_row(session, semaphore, data_line, current_idx, total_l
     async with semaphore:
         try:
             data = json.loads(data_line) if isinstance(data_line, str) else data_line
-            prof_id = data["id"]
+            # Support both DB-backed records (id) and new scrapes (profile_url)
+            if "id" in data:
+                record_key = data["id"]
+                key_field = "id"
+            else:
+                record_key = data["profile_url"]
+                key_field = "profile_url"
             prof_name = data["name"]
             faculty = data.get("faculty", "")
             department = data.get("department", "")
@@ -89,8 +95,8 @@ async def process_single_row(session, semaphore, data_line, current_idx, total_l
             return None
 
         if not clean_markdown or clean_markdown in ["[UNAVAILABLE]", "[ERROR]"]:
-            logger.warning(f"Skipping ID {prof_id} ({prof_name}) - Markdown unavailable.")
-            return _empty_result(prof_id)
+            logger.warning(f"Skipping {record_key} ({prof_name}) - Markdown unavailable.")
+            return _empty_result(record_key, key_field)
 
         prompt = (
             f"Extract structured information about Professor {prof_name} "
@@ -147,16 +153,16 @@ async def process_single_row(session, semaphore, data_line, current_idx, total_l
                 llm_email = data_out.get("email", "").strip()
 
                 if not interests and not bio:
-                    logger.warning(f"ID {prof_id} ({prof_name}) - Empty extraction.")
-                    return _empty_result(prof_id)
+                    logger.warning(f"{record_key} ({prof_name}) - Empty extraction.")
+                    return _empty_result(record_key, key_field)
 
                 kw_str = ", ".join(interests)
                 holistic = f"Professor {prof_name}, {faculty}, {department}. Research interests: {kw_str}."
 
-                logger.info(f"[{current_idx}/{total_lines}] ID {prof_id} ({prof_name}) — {len(interests)} interests, accepting={accepting}")
+                logger.info(f"[{current_idx}/{total_lines}] {record_key} ({prof_name}) — {len(interests)} interests, accepting={accepting}")
 
                 return {
-                    "id": prof_id,
+                    key_field: record_key,
                     "bio": bio,
                     "unique_interests": interests,
                     "accepting_students": accepting,
@@ -165,8 +171,8 @@ async def process_single_row(session, semaphore, data_line, current_idx, total_l
                 }
 
         except Exception as e:
-            logger.error(f"Inference failed for ID {prof_id} ({prof_name}): {e}")
-            return _empty_result(prof_id, "[ERROR]")
+            logger.error(f"Inference failed for {record_key} ({prof_name}): {e}")
+            return _empty_result(record_key, key_field, "[ERROR]")
 
 async def run_cloud_sprint(input_file="cloud_input.jsonl", output_file="cloud_output.jsonl", parallel=24):
     try:
@@ -198,7 +204,7 @@ async def run_cloud_sprint(input_file="cloud_input.jsonl", output_file="cloud_ou
 
     # Filter out Nones and sort
     results = [r for r in raw_results if r is not None]
-    results.sort(key=lambda r: r["id"])
+    results.sort(key=lambda r: r.get("id", r.get("profile_url", "")))
 
     try:
         with open(output_file, 'w') as f:
